@@ -1,0 +1,28 @@
+GRAPH WITH 4 NODES 
+4 vertices: [['A', [13, 19]], ['B', [3, 7]], ['C', [17, 8]], ['D', [4, 6]]]
+4 edges : [['A', 'B'], ['D', 'A'], ['A', 'C'], ['C', 'D']]
+
+Adjacency list: {'A': ['B', 'D', 'C'], 'B': ['A'], 'D': ['A', 'C'], 'C': ['A', 'D']}
+Weight list: {('A', 'B'): 16, ('D', 'A'): 16, ('A', 'C'): 12, ('C', 'D'): 13}
+
+WITH THE GREEDY ALGORITHM: 
+Maximum weight cut: 44
+Subset S: ['A']
+Subset T: ['B', 'D', 'C']
+NUMBER OF ITERATIONS: 2
+TOTAL EXECUTION TIME: 1.8596649169921875e-05s
+
+WITH THE SIMPLE RANDOMIZED ALGORITHM: 
+Maximum weight cut: 25
+Subset S: ['C']
+Subset T: ['A', 'B', 'D']
+NUMBER OF ITERATIONS: 4
+TOTAL EXECUTION TIME: 1.9788742065429688e-05s
+
+WITH THE COMPLEX RANDOMIZED ALGORITHM: 
+Maximum weight cut: 29
+Subset S: ('D',)
+Subset T: ['A', 'B', 'C']
+NUMBER OF ITERATIONS: 9
+TOTAL EXECUTION TIME: 7.104873657226562e-05s
+

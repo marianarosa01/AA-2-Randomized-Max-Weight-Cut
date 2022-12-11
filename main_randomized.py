@@ -11,7 +11,7 @@ from pyparsing import Or
 from regex import P
 import time
 import pandas as pd
-
+from decimal import Decimal  
 import random
 '''  '''
 random.seed(98390)
@@ -39,7 +39,7 @@ def adjacency_list(edges):
     return adjacency_lst
 
 
-def check_if_there_are_isolated_vertex(vertex,edges): #If there is any check isolated_vertex the problem is not solvable
+def check_if_is_possible(vertex,edges): #If there is any check isolated_vertex the problem is not solvable 
     adj_list = adjacency_list(edges)
     vertex_in_adj_list = list(adj_list.keys())
     graph_vertex = [v for v,p in vertex]
@@ -82,31 +82,20 @@ def find_cut_randomized_simple(vertex, edges):
     #Randomized algorithm
     #{"Subset S": cut_value}
     weights = calc_weight_edges(vertex, edges)
+    iteration = 0
+    subsetS = []
+    subsetT = []
+    for v in vertex:
+        iteration += 1
+        result = random.choice(["Heads","Tails"])
+        if result == "Heads":
+            subsetS.append(v[0])
+        else:
+            subsetT.append(v[0])
+        
+    cut_weight = calculate_weight_cut(subsetS, subsetT, weights)
 
-    dic_solution_cut = {}
-    dic_iteration_max_cut = {}
-
-    iterations = 0.2 * 2**len(edges)
-    print("ITERATIONS", iterations)
-    iteration = 0 
-
-    for i in range(int(iterations)):
-        subsetS = []
-        subsetT = []
-        iteration +=  1
-        for v in vertex:
-            result = random.choice(["Heads","Tails"])
-            if result == "Heads":
-                subsetS.append(v[0])
-            else:
-                subsetT.append(v[0])
-            tuple_subset_s = tuple(subsetS)
-            if  subsetS != [] and tuple_subset_s not in dic_solution_cut.keys():
-                dic_solution_cut[tuple_subset_s] = calculate_weight_cut(subsetS, subsetT, weights)
-
-
-        best_solution = max(dic_solution_cut.values())
-        dic_iteration_max_cut[iteration] = best_solution
+    return cut_weight, subsetS, subsetT, iteration 
 
 
 
@@ -134,19 +123,13 @@ def find_cut_randomized_algorithm(vertex,edges,weights): #1ª Função
                 if e1[0] not in subset_s and e1[1] not in subset_t and e1[0] not in subset_t and e1[1] not in subset_s:
                     subset_s.append(e1[0])
                     subset_t.append(e1[1])
-                if e1[1] not in subset_s and e1[0] not in subset_t and e1[0] not in subset_s and e1[1] not in subset_t:
-                    subset_s.append(e1[1])
-                    subset_t.append(e1[0])
+                
 
             elif weights_e1 < weights_e2:
 
                 if e2[0] not in subset_s and e2[1] not in subset_t and e2[0] not in subset_t and e2[1] not in subset_s:
                     subset_s.append(e2[0])
                     subset_t.append(e2[1])
-                if e2[1] not in subset_s and e2[0] not in subset_t and e2[0] not in subset_s and e2[1] not in subset_t:
-                    subset_s.append(e2[1])
-                    subset_t.append(e2[0])
-
 
             if weights_e1 == weights_e2:
                 result = random.choice(["Heads","Tails"])
@@ -164,34 +147,44 @@ def find_cut_randomized_algorithm(vertex,edges,weights): #1ª Função
             subset_t.append(v[0])
 
     
-    max_cut = calculate_weight_cut(subset_s, subset_t, weights)
-    return subset_s, subset_t, max_cut, iterations
+    cut_value = calculate_weight_cut(subset_s, subset_t, weights)
+    return subset_s, subset_t, cut_value, iterations 
 
 def perform_randomized_algorithm(vertex, edges,weights): #2ª função, comparar com brute force e ver qual é melhor
     iteration = 0 
 
     dic_subsetS_maxcut = {}
+    if len(edges)<= 15:
+        number_iterations = 0.2 * 2**len(edges)
 
-    number_iterations = int(0.2*2**len(edges))
+    elif len(edges)> 16 and len(edges)<25:
+        print("hi")
+        number_iterations = 0.1 * 2**len(edges)
+    else:
+        number_iterations = 1000
 
-    for i in range(number_iterations):
-        iteration += 1
+    for i in range(int(number_iterations)):
+        
         result = find_cut_randomized_algorithm(vertex, edges,weights)
-    
+        iterations_before =  result[3]
+        if iteration == 0:
+            iteration = iterations_before + 1
+
+        else:
+            iteration +=1 
+
         subset_s = result[0]
         subset_t = result[1]
         max_cut = result[2]
-        number_iterations = result[3]
+       
         tuple_subset_s = tuple(subset_s)
         if tuple_subset_s not in dic_subsetS_maxcut.keys():
-            dic_subsetS_maxcut[tuple_subset_s] = (max_cut, subset_t, number_iterations)
+            dic_subsetS_maxcut[tuple_subset_s] = (max_cut, subset_t)
 
     best_solution = max(dic_subsetS_maxcut.values())
     subset_s = list(dic_subsetS_maxcut.keys())[list(dic_subsetS_maxcut.values()).index(best_solution)]
     subset_t = best_solution[1]
     max_cut = best_solution[0]
-    number_iterations = best_solution[2]
-
     print("BEST SOLUTION: ", best_solution)
 
     return subset_s, subset_t, max_cut, iteration
@@ -286,68 +279,92 @@ def find_max_cut_greedy(vertex, edges, weights): #Greedy algorithm
 
 
 def save_solution(vertex, edges, filepath):     #Save the solution in a txt file
+    print("LEN VERTEX: ", len(vertex))
+    print("LEN EDGES: ", len(edges))
     
     time_start_brute = time.time()
-    name_file = "max_cut_"+str(len(vertex))+"_vertex_" + \
+    name_file = "max_cut_randomized_"+str(len(vertex))+"_vertex_" + \
         str(len(edges))+"_edges"+".txt"
     adj_list = adjacency_list(edges)
     weights = calc_weight_edges(vertex, edges)
-    if check_if_there_are_isolated_vertex(vertex, edges) == True:
+    if check_if_is_possible(vertex, edges) == True or len(vertex) <= 2 or len(edges) < 3:
         print("The problem is not solvable")
         with open(os.path.join(filepath, name_file), "w") as f:
             f.write("GRAPH WITH "+str(len(vertex))+" NODES \n\n")
             f.write(str(len(vertex)) + " vertices: " + str(vertex)+"\n")
             f.write(str(len(edges)) + " edges : " + str(edges)+"\n\n")
             f.write("Adjacency list: "+str(adj_list)+"\n")
-            f.write("This problem is not solvable, it has isolated vertices.")
+            f.write("This problem is not solvable, it has isolated vertices or it doens't require the conditions to execute the algorithm.")
             f.close()
     else:
-
+        """
+        
         #Brute force
         max_cut_brute = find_max_cut_brute_force(vertex, edges, weights)
         time_end = time.time()
         execution_time_brute = str(time_end - time_start_brute)
-
+        """
         #Greedy
         time_start_greedy = time.time()
         max_cut_greedy = find_max_cut_greedy(vertex, edges, weights)
         time_end_greedy = time.time()
         execution_time_greedy = str(time_end_greedy - time_start_greedy)
         
+        #Simple randomized
+        time_start_simple_rand = time.time() 
+        max_cut_randomized_simple = find_cut_randomized_simple(vertex, edges)
+        time_end_simple_rand = time.time()
+        execution_time_simple_rand = str(time_end_simple_rand - time_start_simple_rand)
+
+
         #Randomized
         time_start_randomized = time.time()
+        print("RANDOMIZED ALGORITHM")
         max_cut_randomized = perform_randomized_algorithm(vertex, edges, weights)
+        print("RANDOMIZEDMAX CUT VALUE: ", max_cut_randomized[0])
         time_end_randomized = time.time()
         execution_time_randomized = str(time_end_randomized - time_start_randomized)
-
-
+        print("TIME RANDOMIZED: ", execution_time_randomized)
+        print("PLOTTING")
+        plot_cut(vertex, edges, max_cut_randomized[0],"solutions","randomized")
+    
         with open(os.path.join(filepath, name_file), "w") as f:
 
-            f.write("GRAPH WITH "+str(len(vertex))+" NODES \n\n")
+            f.write("GRAPH WITH "+str(len(vertex))+" NODES \n")
             f.write(str(len(vertex)) + " vertices: "+str(vertex)+"\n")
             f.write(str(len(edges)) + " edges : "+str(edges)+"\n\n")
             f.write("Adjacency list: "+str(adj_list)+"\n")
-            f.write("Weight list: "+str(weights)+"\n")
+            f.write("Weight list: "+str(weights)+"\n\n")
 
+            """
             f.write("WITH THE BRUTE FORCE ALGORITHM: \n")
             f.write("Maximum weight cut: " + str(max_cut_brute[0]) + "\n")
             f.write("Subset S: " + str(max_cut_brute[1]) + "\n")
             f.write("Subset T: " + str(max_cut_brute[2]) + "\n")
-            f.write("NUMBER OF ITERATIONS: "+str(max_cut_brute[3])+"\n\n")
+            f.write("NUMBER OF ITERATIONS: "+str(max_cut_brute[3])+"\n")
             f.write("TOTAL EXECUTION TIME: "+str(execution_time_brute)+"s \n\n")
-
+            """
             f.write("WITH THE GREEDY ALGORITHM: \n")
             f.write("Maximum weight cut: " + str(max_cut_greedy[0]) + "\n")
             f.write("Subset S: " + str(max_cut_greedy[1]) + "\n")
             f.write("Subset T: " + str(max_cut_greedy[2]) + "\n")
-            f.write("NUMBER OF ITERATIONS: "+str(max_cut_greedy[3])+"\n\n")
+            f.write("NUMBER OF ITERATIONS: "+str(max_cut_greedy[3])+"\n")
             f.write("TOTAL EXECUTION TIME: "+execution_time_greedy+"s\n\n")
 
-            f.write("WITH THE RANDOMIZED ALGORITHM: \n")
+
+            f.write("WITH THE SIMPLE RANDOMIZED ALGORITHM: \n")
+            f.write("Maximum weight cut: " + str(max_cut_randomized_simple[0]) + "\n")
+            f.write("Subset S: " + str(max_cut_randomized_simple[1]) + "\n")
+            f.write("Subset T: " + str(max_cut_randomized_simple[2]) + "\n")
+            f.write("NUMBER OF ITERATIONS: "+str(max_cut_randomized_simple[3])+"\n")
+            f.write("TOTAL EXECUTION TIME: "+execution_time_simple_rand+"s\n\n")
+
+
+            f.write("WITH THE COMPLEX RANDOMIZED ALGORITHM: \n")
             f.write("Maximum weight cut: " + str(max_cut_randomized[2]) + "\n")
             f.write("Subset S: " + str(max_cut_randomized[0]) + "\n")
             f.write("Subset T: " + str(max_cut_randomized[1]) + "\n")
-            f.write("NUMBER OF ITERATIONS: "+str(max_cut_randomized[3])+"\n\n")
+            f.write("NUMBER OF ITERATIONS: "+str(max_cut_randomized[3])+"\n")
             f.write("TOTAL EXECUTION TIME: "+execution_time_randomized+"s\n\n")
 
 
@@ -356,26 +373,21 @@ def save_solution(vertex, edges, filepath):     #Save the solution in a txt file
 
 def plot_cut(vertices, edges, cuts,filepath,algorithm):
     #Plot the graph with the cut being the vertices in red the ones belonging to subset S and the ones in blue to subset T
-
     n_vertex = len(vertices)
     n_edges = len(edges)
-
     weight_edges = calc_weight_edges(vertices, edges)
     G = nx.Graph()
-
     color_map = []
-
     for edge in edges:
         G.add_edge(edge[0], edge[1], weight=weight_edges[(edge[0], edge[1])])
     for node in range(len(vertices)):
-        
+
         if vertices[node][0] in cuts:
             color_map.append('red')
             G.add_node(vertices[node][0], pos=vertices[node][1], color='red')
         else:
             color_map.append('blue')
-            G.add_node(vertices[node][0], pos=vertices[node][1])
-
+            G.add_node(vertices[node][0], pos=vertices[node][1],color='blue')
     labels = nx.get_edge_attributes(G, 'weight')
     pos = nx.get_node_attributes(G, 'pos')
     nx.draw_networkx_edge_labels(G, pos, labels)
@@ -410,15 +422,44 @@ def analyse_file(file_name):
             vertex.append([str(i), pos])
     return vertex, edges
 
+
+def plot_solutions_all():  #Plot all the solutions
+
+    percentages = [12.5, 25, 50, 75]
+
+    for p in percentages:
+        path_percentage = "Percentage_" + str(p)
+        path_solution = "solutions/"+path_percentage
+
+        if os.path.exists(path_solution) == False:
+            os.mkdir(path_solution)
+        json_files = [pos_json for pos_json in os.listdir(
+            "generated_graphs_first_project/"+path_percentage) if pos_json.endswith('.json')]
+        jsons_data = pd.DataFrame(columns=['vertices', 'edges'])
+        print(json_files)
+        for index, js in enumerate(json_files):
+            print("ha")
+            with open(os.path.join("generated_graphs_first_project/"+path_percentage, js)) as json_file:
+                json_text = json.load(json_file)
+                vertex = json_text["vertices"]
+                edges = json_text["edges"]
+                save_solution(vertex, edges, path_solution)
+                jsons_data.loc[index] = [vertex, edges]
+
+
+
 graph1 = analyse_file("SW_ALGUNS_GRAFOS/SWtinyG.txt")
 graph2 = analyse_file("SW_ALGUNS_GRAFOS/SWmediumG.txt")
-#graph3 = analyse_file("SW_ALGUNS_GRAFOS/SWlargeG.txt")
+graph3 = analyse_file("SW_ALGUNS_GRAFOS/SWlargeG.txt")
+vertices=[["A", [5, 2]], ["B", [20, 11]], ["C", [2, 5]], ["D", [15, 12]], ["E", [5, 17]], ["F", [17, 1]], ["G", [16, 9]], ["H", [4, 1]], ["I", [5, 16]], ["J", [14, 16]], ["K", [9, 15]], ["L", [2, 1]], ["M", [11, 12]], ["N", [6, 10]], ["O", [19, 17]], ["P", [18, 1]], ["Q", [12, 10]], ["R", [14, 18]]]
+edges = [["K", "G"], ["J", "M"], ["J", "R"], ["B", "E"], ["C", "M"], ["R", "P"], ["Q", "I"], ["L", "H"], ["P", "I"], ["G", "C"], ["B", "L"], ["D", "C"], ["N", "P"], ["E", "D"], ["L", "D"], ["Q", "C"], ["R", "N"], ["M", "N"], ["M", "E"], ["C", "I"], ["E", "N"], ["A", "P"], ["G", "L"], ["E", "Q"], ["L", "O"], ["P", "H"], ["A", "C"], ["M", "G"], ["G", "B"], ["R", "C"], ["P", "Q"], ["R", "E"], ["P", "O"], ["H", "R"], ["F", "B"]]
+save_solution(vertices, edges, "solutions")
 
-print("Graph 0",graph1[0])
-print("Graph 1",graph1[1])
-save_solution(graph1[0], graph1[1], "solutions")
-save_solution(graph2[0], graph2[1], "solutions")
+#save_solution(graph1[0], graph1[1], "solutions")
+#save_solution(v, edges, "solutions")#
+#max_cut = save_solution(graph1[0], graph1[1], "solutions")
+#save_solution(graph2[0], graph2[1], "solutions")
 #save_solution(graph3[0], graph3[1], "solutions")
 
-
+plot_solutions_all()
 #perform_multiple_times_algorithms(graph1[0], graph1[1])

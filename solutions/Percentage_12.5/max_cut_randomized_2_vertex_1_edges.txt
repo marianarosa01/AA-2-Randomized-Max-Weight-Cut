@@ -1,0 +1,7 @@
+GRAPH WITH 2 NODES 
+
+2 vertices: [['A', [3, 4]], ['B', [16, 15]]]
+1 edges : [['A', 'B']]
+
+Adjacency list: {'A': ['B'], 'B': ['A']}
+This problem is not solvable, it has isolated vertices or it doens't require the conditions to execute the algorithm.

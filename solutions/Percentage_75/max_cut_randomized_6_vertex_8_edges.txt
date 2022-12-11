@@ -1,0 +1,28 @@
+GRAPH WITH 6 NODES 
+6 vertices: [['A', [16, 1]], ['B', [5, 16]], ['C', [19, 5]], ['D', [3, 12]], ['E', [7, 14]], ['F', [17, 12]]]
+8 edges : [['A', 'E'], ['D', 'B'], ['B', 'E'], ['A', 'D'], ['D', 'F'], ['D', 'E'], ['C', 'B'], ['B', 'A']]
+
+Adjacency list: {'A': ['E', 'D', 'B'], 'E': ['A', 'B', 'D'], 'D': ['B', 'A', 'F', 'E'], 'B': ['D', 'E', 'C', 'A'], 'F': ['D'], 'C': ['B']}
+Weight list: {('A', 'E'): 16, ('D', 'B'): 4, ('B', 'E'): 3, ('A', 'D'): 17, ('D', 'F'): 14, ('D', 'E'): 4, ('C', 'B'): 18, ('B', 'A'): 19}
+
+WITH THE GREEDY ALGORITHM: 
+Maximum weight cut: 44
+Subset S: ['B']
+Subset T: ['A', 'C', 'D', 'E', 'F']
+NUMBER OF ITERATIONS: 6
+TOTAL EXECUTION TIME: 2.7418136596679688e-05s
+
+WITH THE SIMPLE RANDOMIZED ALGORITHM: 
+Maximum weight cut: 70
+Subset S: ['B', 'D', 'E', 'F']
+Subset T: ['A', 'C']
+NUMBER OF ITERATIONS: 6
+TOTAL EXECUTION TIME: 4.076957702636719e-05s
+
+WITH THE COMPLEX RANDOMIZED ALGORITHM: 
+Maximum weight cut: 75
+Subset S: ('D', 'B')
+Subset T: ['E', 'A', 'C', 'F']
+NUMBER OF ITERATIONS: 61
+TOTAL EXECUTION TIME: 0.0008940696716308594s
+

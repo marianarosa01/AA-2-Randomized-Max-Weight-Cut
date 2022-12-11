@@ -1,0 +1,28 @@
+GRAPH WITH 10 NODES 
+10 vertices: [['A', [2, 3]], ['B', [10, 13]], ['C', [19, 3]], ['D', [9, 15]], ['E', [3, 6]], ['F', [19, 2]], ['G', [20, 14]], ['H', [4, 17]], ['I', [4, 14]], ['J', [18, 20]]]
+20 edges : [['D', 'I'], ['A', 'F'], ['H', 'A'], ['H', 'E'], ['E', 'B'], ['C', 'B'], ['F', 'E'], ['A', 'D'], ['I', 'G'], ['A', 'B'], ['H', 'J'], ['D', 'E'], ['I', 'F'], ['I', 'C'], ['D', 'B'], ['H', 'F'], ['C', 'G'], ['H', 'I'], ['F', 'J'], ['H', 'B']]
+
+Adjacency list: {'D': ['I', 'A', 'E', 'B'], 'I': ['D', 'G', 'F', 'C', 'H'], 'A': ['F', 'H', 'D', 'B'], 'F': ['A', 'E', 'I', 'H', 'J'], 'H': ['A', 'E', 'J', 'F', 'I', 'B'], 'E': ['H', 'B', 'F', 'D'], 'B': ['E', 'C', 'A', 'D', 'H'], 'C': ['B', 'I', 'G'], 'G': ['I', 'C'], 'J': ['H', 'F']}
+Weight list: {('D', 'I'): 5, ('A', 'F'): 17, ('H', 'A'): 14, ('H', 'E'): 11, ('E', 'B'): 10, ('C', 'B'): 13, ('F', 'E'): 16, ('A', 'D'): 14, ('I', 'G'): 16, ('A', 'B'): 13, ('H', 'J'): 14, ('D', 'E'): 11, ('I', 'F'): 19, ('I', 'C'): 19, ('D', 'B'): 2, ('H', 'F'): 21, ('C', 'G'): 11, ('H', 'I'): 3, ('F', 'J'): 18, ('H', 'B'): 7}
+
+WITH THE GREEDY ALGORITHM: 
+Maximum weight cut: 126
+Subset S: ['H', 'I']
+Subset T: ['F', 'C', 'J', 'A', 'E', 'G', 'D', 'B']
+NUMBER OF ITERATIONS: 18
+TOTAL EXECUTION TIME: 4.172325134277344e-05s
+
+WITH THE SIMPLE RANDOMIZED ALGORITHM: 
+Maximum weight cut: 106
+Subset S: ['A', 'B', 'C', 'E', 'F', 'G', 'I']
+Subset T: ['D', 'H', 'J']
+NUMBER OF ITERATIONS: 10
+TOTAL EXECUTION TIME: 6.651878356933594e-05s
+
+WITH THE COMPLEX RANDOMIZED ALGORITHM: 
+Maximum weight cut: 194
+Subset S: ('F', 'D', 'C', 'H')
+Subset T: ['J', 'I', 'B', 'A', 'E', 'G']
+NUMBER OF ITERATIONS: 104877
+TOTAL EXECUTION TIME: 4.159465074539185s
+
