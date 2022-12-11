@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
+
 def read_results():
     # Dicionário para armazenar os resultados sendo a chave o nome do arquivo,
     # e o valor uma lista com os resultados [n, %edges]:[iteracoes, time, max_weight_cut]
@@ -168,7 +169,7 @@ def number_iterations():
     # x-axis label
     plt.xlabel('Nº de vértices do grafo (n)')
     plt.ylabel('Nº iterações')
-    plt.title('Nº de iterações pelos algoritmos de pesquisa gulosa e força bruta')
+    plt.title('Nº de iterações pelos algoritmos de força bruta, pesquisa gulosa e pesquisa aleatória')
     plt.legend()
     plt.savefig('graficos/n_iteracoes_comparacao.png')
     plt.show()
@@ -242,7 +243,7 @@ def execution_time():
 
     plt.xlabel('Nº de vértices do grafo (n)')
     plt.ylabel('Tempo de execução (s)')
-    plt.title('Tempo de execução pelos algoritmos de pesquisa gulosa e força bruta')
+    plt.title('Tempo de execução pelos algoritmos de força bruta, pesquisa gulosa e pesquisa aleatória')
     plt.legend()
     plt.savefig('graficos/tempo_execucao_comparacao.png')
     plt.show()
@@ -276,7 +277,7 @@ def weight_cut_results():
     plt.title('Peso máximo de corte pelo algoritmo de pesquisa gulosa')
     # showing legend
     plt.legend()
-    plt.savefig('graficos/tempo_execucao_greedy.png')
+    plt.savefig('graficos/peso_maximo_greedy.png')
     plt.show()
 
     # Brute force
@@ -288,18 +289,19 @@ def weight_cut_results():
     plt.ylabel('Peso máximo de corte')
     plt.title('Peso máximo de corte pelo algoritmo de força bruta')
     plt.legend()
-    plt.savefig('graficos/tempo_execucao_brute_force.png')
+    plt.savefig('graficos/peso_maximo_brute_force.png')
     plt.show()
 
     ## Randomized
     x = number_vertices_randomized
+    y = list_weight_result_randomized
     plt.scatter(x, y, label="Algoritmo de pesquisa aleatória", color="green", s=30)
     # x-axis label
-    plt.xlabel('Nº de arestas do grafo (m)')
+    plt.xlabel('Nº de vertices do grafo (m)')
     plt.ylabel('Peso máximo de corte')
     plt.title('Peso máximo de corte pelo algoritmo de pesquisa aleatória')
     plt.legend()
-    plt.savefig('graficos/tempo_execucao_randomized.png')
+    plt.savefig('graficos/peso_maximo_randomized.png')
     plt.show()
 
 
@@ -324,8 +326,12 @@ def weight_cut_results():
     plt.ylabel('Peso máximo de corte (s)')
     plt.title('Peso máximo de corte pelos algoritmos pesquisa gulosa, força bruta e pesquisa aleatória' )
     plt.legend()
-    plt.savefig('graficos/tempo_execucao_comparacao.png')
+    plt.savefig('graficos/peso_comparacao.png')
     plt.show()
 
+''' 
 read_results()
+number_iterations()
+weight_cut_results()
 execution_time()
+ '''

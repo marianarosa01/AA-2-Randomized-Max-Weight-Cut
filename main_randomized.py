@@ -16,11 +16,7 @@ import random
 '''  '''
 random.seed(98390)
 
-v = ["A", [9, 6]], ["B", [12, 14]], [
-    "C", [15, 19]], ["D", [10, 19]], ["E", [19, 17]]
-ed = [["C", "E"], ["A", "B"], ["C", "A"], ["C", "B"]]
-
-def adjacency_list(edges):
+def adjacency_list(edges): #1º trabalho 
     # {"vertices": [["A", [7, 6]], ["B", [3, 1]], ["C", [1, 13]], ["D", [12, 12]]],
     # "edges": [["C", "D"], ["A", "B"]]}
 
@@ -39,7 +35,7 @@ def adjacency_list(edges):
     return adjacency_lst
 
 
-def check_if_is_possible(vertex,edges): #If there is any check isolated_vertex the problem is not solvable 
+def check_if_is_possible(vertex,edges): #If there is any check isolated_vertex the problem is not solvable  #1º trabalho 
     adj_list = adjacency_list(edges)
     vertex_in_adj_list = list(adj_list.keys())
     graph_vertex = [v for v,p in vertex]
@@ -52,7 +48,7 @@ def check_if_is_possible(vertex,edges): #If there is any check isolated_vertex t
         return True  #if there are isolated vertex return True
 
 
-def calc_weight_edges(vertices, edges):  # Calculate the weight of the edges
+def calc_weight_edges(vertices, edges):  # Calculate the weight of the edges #1º trabalho 
     dic_edges_count = {} #Example of dic_edges_count {('A', 'B'): 1, ('C', 'D'): 5}
   
     for e1, e2 in edges:
@@ -68,7 +64,7 @@ def calc_weight_edges(vertices, edges):  # Calculate the weight of the edges
 
     return dic_edges_count
 
-def calculate_weight_cut (subsetS, subsetT, weight_list): #Calculate the weight of the cut with the subsets S and T
+def calculate_weight_cut (subsetS, subsetT, weight_list): #Calculate the weight of the cut with the subsets S and T #1º trabalho 
     possible_edges = list(product(subsetS, subsetT))
     weight_sum = 0
     for edge in weight_list.keys():
@@ -77,17 +73,16 @@ def calculate_weight_cut (subsetS, subsetT, weight_list): #Calculate the weight 
     return weight_sum
 
 
-def find_cut_randomized_simple(vertex, edges):
+def find_cut_randomized_simple(vertex, edges): #1º trabalho 
     ### FIRST VERSION ###
     #Randomized algorithm
-    #{"Subset S": cut_value}
     weights = calc_weight_edges(vertex, edges)
     iteration = 0
     subsetS = []
     subsetT = []
     for v in vertex:
         iteration += 1
-        result = random.choice(["Heads","Tails"])
+        result = random.choice(["Heads","Tails"]) #Randomly choose between Heads or Tails
         if result == "Heads":
             subsetS.append(v[0])
         else:
@@ -101,14 +96,12 @@ def find_cut_randomized_simple(vertex, edges):
 
 
 def find_cut_randomized_algorithm(vertex,edges,weights): #1ª Função
-    # Selecionar aleatóriamente 2 vertices do grafo, 1/2 dos vértices existentes 
-    # Escolher o que tem aresta mais pesada para o subset S, por E1 = [V1,V2]. V1 vai para S, V2 para T
-    # Fazer isto x vezes, sendo x 1/2*len(vertex)
+
     subset_s = []
     subset_t = []
     iterations = 0
 
-    for i in range (int(len(edges)/2)):
+    for i in range (int(len(edges)/2)): #Durante i vezes, onde i = metade dos edges, escolher aleatoriamente dois edges e comparar os seus pesos
         iterations += 1
         e1 = random.choice(edges)
         e2 = random.choice(edges) 
@@ -119,19 +112,19 @@ def find_cut_randomized_algorithm(vertex,edges,weights): #1ª Função
             weights_e1 = weights[tuple_e1]
             weights_e2 = weights[tuple_e2]
 
-            if weights_e1 > weights_e2:
+            if weights_e1 > weights_e2: #Se o peso do edge 1 for maior que o peso do edge 2, adicionar os vertices do edge 1 ao subset s e t
                 if e1[0] not in subset_s and e1[1] not in subset_t and e1[0] not in subset_t and e1[1] not in subset_s:
                     subset_s.append(e1[0])
                     subset_t.append(e1[1])
                 
 
-            elif weights_e1 < weights_e2:
+            elif weights_e1 < weights_e2: #Se o peso do edge 2 for maior que o peso do edge 1, adicionar os vertices do edge 2 ao subset s e t
 
                 if e2[0] not in subset_s and e2[1] not in subset_t and e2[0] not in subset_t and e2[1] not in subset_s:
                     subset_s.append(e2[0])
                     subset_t.append(e2[1])
 
-            if weights_e1 == weights_e2:
+            if weights_e1 == weights_e2: #Se o peso do edge 1 for igual ao peso do edge 2, escolher aleatoriamente entre adicionar os vertices do edge 1 ou do edge 2 ao subset s e t
                 result = random.choice(["Heads","Tails"])
                 if result == "Heads":
                     if e1[0] not in subset_s and e1[1] not in subset_t and e1[0] not in subset_t and e1[1] not in subset_s:
@@ -141,19 +134,22 @@ def find_cut_randomized_algorithm(vertex,edges,weights): #1ª Função
                     if e2[0] not in subset_s and e2[1] not in subset_t and e2[0] not in subset_t and e2[1] not in subset_s:
                         subset_s.append(e2[0])
                         subset_t.append(e2[1])
-    for v in vertex:
+    for v in vertex: #Adicionar os vertices que não foram adicionados ao subset t
         iterations += 1
         if v[0] not in subset_s and v[0] not in subset_t:
             subset_t.append(v[0])
 
     
-    cut_value = calculate_weight_cut(subset_s, subset_t, weights)
+    cut_value = calculate_weight_cut(subset_s, subset_t, weights) #Calcular o valor do cut
     return subset_s, subset_t, cut_value, iterations 
 
-def perform_randomized_algorithm(vertex, edges,weights): #2ª função, comparar com brute force e ver qual é melhor
+def perform_randomized_algorithm(vertex, edges,weights): #2ª Função
+    time_start = time.time()
+
     iteration = 0 
 
     dic_subsetS_maxcut = {}
+    #Fazer limites para o número de iterações consoante as arestas
     if len(edges)<= 15:
         number_iterations = 0.2 * 2**len(edges)
 
@@ -165,20 +161,20 @@ def perform_randomized_algorithm(vertex, edges,weights): #2ª função, comparar
 
     for i in range(int(number_iterations)):
         
-        result = find_cut_randomized_algorithm(vertex, edges,weights)
+        result = find_cut_randomized_algorithm(vertex, edges,weights) #Chamar a função find_cut_randomized_algorithm para calcular o cut
         iterations_before =  result[3]
-        if iteration == 0:
-            iteration = iterations_before + 1
+        if iteration == 0: #Se for a primeira iteração, calcular o número de iterações com base no número de iterações da função find_cut_randomized_algorithm
+            iteration = iterations_before + 1 #Adicionar um
 
         else:
-            iteration +=1 
+            iteration +=1 #Se não for a primeira iteração, adicionar 1 ao número de iterações
 
         subset_s = result[0]
         subset_t = result[1]
         max_cut = result[2]
-       
         tuple_subset_s = tuple(subset_s)
-        if tuple_subset_s not in dic_subsetS_maxcut.keys():
+
+        if tuple_subset_s not in dic_subsetS_maxcut.keys(): #Se o subset s não estiver no dicionário, adicionar o subset s e o seu valor de cut para encontrar sempre o máximo
             dic_subsetS_maxcut[tuple_subset_s] = (max_cut, subset_t)
 
     best_solution = max(dic_subsetS_maxcut.values())
@@ -186,17 +182,19 @@ def perform_randomized_algorithm(vertex, edges,weights): #2ª função, comparar
     subset_t = best_solution[1]
     max_cut = best_solution[0]
     print("BEST SOLUTION: ", best_solution)
+    print("TIME", time.time() - time_start, "seconds")
+
 
     return subset_s, subset_t, max_cut, iteration
         
 
 
 
-def find_max_cut_brute_force(vertex, edges,weights):
+def find_max_cut_brute_force(vertex, edges,weights): #1º trabalho 
     #Brute force algorithm
     #We are going to find all the possible combinations of subsets S and T and then we are going to calculate the weight of the cut for each one of them
     #The combination with the highest weight will be the one we are going to return
-
+    time_start = time.time()
     adj_list = adjacency_list(edges)
     possible_cuts = []
     dic_cut_weight = {}
@@ -225,6 +223,8 @@ def find_max_cut_brute_force(vertex, edges,weights):
     subset_s = list(max_cut_vertices.split(','))
     subset_t = list(set(graph_vertex) - set(subset_s))
     max_cut_value = dic_cut_weight[max_cut_vertices]
+    time_end = time.time()
+    print("TIME: ", time_end - time_start)
 
     print("MAX CUT VALUE: ", max_cut_value)
 
@@ -232,7 +232,7 @@ def find_max_cut_brute_force(vertex, edges,weights):
 
 
     
-def find_max_cut_greedy(vertex, edges, weights): #Greedy algorithm
+def find_max_cut_greedy(vertex, edges, weights): #Greedy algorithm 1º trabalho
 
     sorted_weights = {edge: cost for edge, cost in sorted(weights.items(), key=lambda item: item[1], reverse=True)}
 
@@ -278,7 +278,7 @@ def find_max_cut_greedy(vertex, edges, weights): #Greedy algorithm
 
 
 
-def save_solution(vertex, edges, filepath):     #Save the solution in a txt file
+def save_solution(vertex, edges, filepath):     #Save the solution in a txt file 1º trabalho, com upgrades para este
     print("LEN VERTEX: ", len(vertex))
     print("LEN EDGES: ", len(edges))
     
@@ -298,18 +298,18 @@ def save_solution(vertex, edges, filepath):     #Save the solution in a txt file
             f.close()
     else:
         """
-        
+        RESULTADOS JÁ ANALISADOS NO PRIMEIRO TRABALHO
         #Brute force
         max_cut_brute = find_max_cut_brute_force(vertex, edges, weights)
         time_end = time.time()
         execution_time_brute = str(time_end - time_start_brute)
-        """
+        
         #Greedy
         time_start_greedy = time.time()
         max_cut_greedy = find_max_cut_greedy(vertex, edges, weights)
         time_end_greedy = time.time()
         execution_time_greedy = str(time_end_greedy - time_start_greedy)
-        
+        """
         #Simple randomized
         time_start_simple_rand = time.time() 
         max_cut_randomized_simple = find_cut_randomized_simple(vertex, edges)
@@ -343,13 +343,13 @@ def save_solution(vertex, edges, filepath):     #Save the solution in a txt file
             f.write("Subset T: " + str(max_cut_brute[2]) + "\n")
             f.write("NUMBER OF ITERATIONS: "+str(max_cut_brute[3])+"\n")
             f.write("TOTAL EXECUTION TIME: "+str(execution_time_brute)+"s \n\n")
-            """
             f.write("WITH THE GREEDY ALGORITHM: \n")
             f.write("Maximum weight cut: " + str(max_cut_greedy[0]) + "\n")
             f.write("Subset S: " + str(max_cut_greedy[1]) + "\n")
             f.write("Subset T: " + str(max_cut_greedy[2]) + "\n")
             f.write("NUMBER OF ITERATIONS: "+str(max_cut_greedy[3])+"\n")
             f.write("TOTAL EXECUTION TIME: "+execution_time_greedy+"s\n\n")
+            """
 
 
             f.write("WITH THE SIMPLE RANDOMIZED ALGORITHM: \n")
@@ -371,40 +371,8 @@ def save_solution(vertex, edges, filepath):     #Save the solution in a txt file
             f.close()
 
 
-def plot_cut(vertices, edges, cuts,filepath,algorithm):
-    #Plot the graph with the cut being the vertices in red the ones belonging to subset S and the ones in blue to subset T
-    n_vertex = len(vertices)
-    n_edges = len(edges)
-    weight_edges = calc_weight_edges(vertices, edges)
-    G = nx.Graph()
-    color_map = []
-    for edge in edges:
-        G.add_edge(edge[0], edge[1], weight=weight_edges[(edge[0], edge[1])])
-    for node in range(len(vertices)):
 
-        if vertices[node][0] in cuts:
-            color_map.append('red')
-            G.add_node(vertices[node][0], pos=vertices[node][1], color='red')
-        else:
-            color_map.append('blue')
-            G.add_node(vertices[node][0], pos=vertices[node][1],color='blue')
-    labels = nx.get_edge_attributes(G, 'weight')
-    pos = nx.get_node_attributes(G, 'pos')
-    nx.draw_networkx_edge_labels(G, pos, labels)
-    nx.draw(G, pos, with_labels=True, node_color=color_map)
-    if algorithm == "brute_force":
-        plt.savefig(f"{filepath}/{n_vertex}vertices_{n_edges}_edges_brute.png", format="PNG")
-        plt.close()
-
-    elif algorithm == "greedy":
-        plt.savefig(f"{filepath}/{n_vertex}vertices_{n_edges}_edges_greedy.png", format="PNG")
-        plt.close()
-
-    elif algorithm == "randomized":
-        plt.savefig(f"{filepath}/{n_vertex}vertices_{n_edges}_edges_randomized.png", format="PNG")
-        plt.close()
-
-def analyse_file(file_name):
+def analyse_file(file_name): #funcao desenvolvida para ler os grafos fornecidos pelos docentes e guardar os dados num array
     n_vertex = 0
     n_edges = 0
     vertex = []
@@ -423,7 +391,7 @@ def analyse_file(file_name):
     return vertex, edges
 
 
-def plot_solutions_all():  #Plot all the solutions
+def plot_solutions_all():  #Correr o algoritmo para todos os grafos gerados no primeiro trabalho 
 
     percentages = [12.5, 25, 50, 75]
 
@@ -438,7 +406,6 @@ def plot_solutions_all():  #Plot all the solutions
         jsons_data = pd.DataFrame(columns=['vertices', 'edges'])
         print(json_files)
         for index, js in enumerate(json_files):
-            print("ha")
             with open(os.path.join("generated_graphs_first_project/"+path_percentage, js)) as json_file:
                 json_text = json.load(json_file)
                 vertex = json_text["vertices"]
@@ -449,17 +416,8 @@ def plot_solutions_all():  #Plot all the solutions
 
 
 graph1 = analyse_file("SW_ALGUNS_GRAFOS/SWtinyG.txt")
-graph2 = analyse_file("SW_ALGUNS_GRAFOS/SWmediumG.txt")
-graph3 = analyse_file("SW_ALGUNS_GRAFOS/SWlargeG.txt")
-vertices=[["A", [5, 2]], ["B", [20, 11]], ["C", [2, 5]], ["D", [15, 12]], ["E", [5, 17]], ["F", [17, 1]], ["G", [16, 9]], ["H", [4, 1]], ["I", [5, 16]], ["J", [14, 16]], ["K", [9, 15]], ["L", [2, 1]], ["M", [11, 12]], ["N", [6, 10]], ["O", [19, 17]], ["P", [18, 1]], ["Q", [12, 10]], ["R", [14, 18]]]
-edges = [["K", "G"], ["J", "M"], ["J", "R"], ["B", "E"], ["C", "M"], ["R", "P"], ["Q", "I"], ["L", "H"], ["P", "I"], ["G", "C"], ["B", "L"], ["D", "C"], ["N", "P"], ["E", "D"], ["L", "D"], ["Q", "C"], ["R", "N"], ["M", "N"], ["M", "E"], ["C", "I"], ["E", "N"], ["A", "P"], ["G", "L"], ["E", "Q"], ["L", "O"], ["P", "H"], ["A", "C"], ["M", "G"], ["G", "B"], ["R", "C"], ["P", "Q"], ["R", "E"], ["P", "O"], ["H", "R"], ["F", "B"]]
-save_solution(vertices, edges, "solutions")
+weights_graph1 = calc_weight_edges(graph1[0], graph1[1])  #calcular os pesos do grafo 1
+#save_solution(graph1[0], graph1[1], "solutions") testar o algoritmo para o grafo 1
 
-#save_solution(graph1[0], graph1[1], "solutions")
-#save_solution(v, edges, "solutions")#
-#max_cut = save_solution(graph1[0], graph1[1], "solutions")
-#save_solution(graph2[0], graph2[1], "solutions")
-#save_solution(graph3[0], graph3[1], "solutions")
-
-plot_solutions_all()
-#perform_multiple_times_algorithms(graph1[0], graph1[1])
+graph2 = analyse_file("SW_ALGUNS_GRAFOS/SWmediumG.txt") #nao consegue resolver
+graph3 = analyse_file("SW_ALGUNS_GRAFOS/SWlargeG.txt") #nao consegue resolver
